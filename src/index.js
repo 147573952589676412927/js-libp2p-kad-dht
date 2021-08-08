@@ -66,7 +66,7 @@ class KadDHT extends EventEmitter {
    * @param {object} props.validators - validators object with namespace as keys and function(key, record, callback)
    * @param {object} props.selectors - selectors object with namespace as keys and function(key, records)
    * @param {RandomWalkOptions} props.randomWalk - randomWalk options
-   * @param {(peerId: PeerId) => Promise<boolean>} props.remotePeerFilter- randomWalk options
+   * @param {(peerId: PeerId) => boolean} props.remotePeerFilter- randomWalk options
    * @param {function(import('libp2p-record').Record, PeerId): void} [props.onPut] - Called when an entry is added to or changed in the datastore
    * @param {function(import('libp2p-record').Record): void} [props.onRemove] - Called when an entry is removed from the datastore
    */
@@ -125,7 +125,7 @@ class KadDHT extends EventEmitter {
     /**
      * Remote peer filter
      *
-     * @type {(peerId: PeerId) => Promise<boolean>}
+     * @type {(peerId: PeerId) => boolean}
      */
     this.remotePeerFilter = remotePeerFilter;
 

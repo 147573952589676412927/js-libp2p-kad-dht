@@ -21,9 +21,9 @@ class RoutingTable {
   /**
    * @param {PeerId} self
    * @param {number} kBucketSize
-   * @param {(peerId: PeerId) => Promise<boolean>} remotePeerFilter
+   * @param {(peerId: PeerId) => boolean} remotePeerFilter
    */
-  constructor (self, kBucketSize, remotePeerFilter = async (peer) => true) {
+  constructor (self, kBucketSize, remotePeerFilter = (peer) => true) {
     this.self = self
     this._onPing = this._onPing.bind(this)
     this._remotePeerFilter = remotePeerFilter;
@@ -124,7 +124,7 @@ class RoutingTable {
    * @param {PeerId} peer
    */
   async add (peer) {
-    if (!await this._remotePeerFilter(peer)) {
+    if (!this._remotePeerFilter(peer)) {
       return;
     }
 

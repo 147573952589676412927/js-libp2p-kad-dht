@@ -70,6 +70,7 @@ module.exports = (dht) => {
 
     return msg.closerPeers
       .filter((peerData) => !dht._isSelf(peerData.id))
+      .filter((peerData) => dht.remotePeerFilter(peerData.id))
       .map((peerData) => {
         dht.peerStore.addressBook.add(peerData.id, peerData.multiaddrs)
 
@@ -195,7 +196,7 @@ module.exports = (dht) => {
       }
 
       let success = false
-      result.paths.forEach((result) => {
+      result.paths.forEach(async (result) => {
         if (result.success && result.peer) {
           success = true
           dht.peerStore.addressBook.add(result.peer.id, result.peer.multiaddrs)
