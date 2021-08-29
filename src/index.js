@@ -311,7 +311,7 @@ class KadDHT extends EventEmitter {
 
     try {
       await this.datastore.delete(dsKey)
-    } catch (err) {
+    } catch (/** @type {any} */err) {
       if (err.code === 'ERR_NOT_FOUND') {
         return undefined
       }
@@ -466,7 +466,7 @@ class KadDHT extends EventEmitter {
     let rawRecord
     try {
       rawRecord = await this.datastore.get(dsKey)
-    } catch (err) {
+    } catch (/** @type {any} */err) {
       if (err.code === 'ERR_NOT_FOUND') {
         return undefined
       }

@@ -127,7 +127,7 @@ class RandomWalk {
             timeout: walkTimeout,
             signal: this._controller.signal
           })
-        } catch (err) {
+        } catch (/** @type {any} */err) {
           if (err && err.code !== 'ETIMEDOUT') {
             this.log.error('query %d finished with error', index, err)
             throw err
@@ -165,7 +165,7 @@ class RandomWalk {
     let peer
     try {
       peer = await this._kadDHT.findPeer(id, options)
-    } catch (err) {
+    } catch (/** @type {any} */err) {
       if (err && err.code === 'ERR_NOT_FOUND') {
         // expected case, we asked for random stuff after all
         return

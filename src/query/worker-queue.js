@@ -239,7 +239,7 @@ class WorkerQueue {
     let res, queryError
     try {
       res = await this.path.queryFunc(peer)
-    } catch (err) {
+    } catch (/** @type {any} */err) {
       queryError = err
     }
 

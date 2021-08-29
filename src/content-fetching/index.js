@@ -152,7 +152,7 @@ module.exports = (dht) => {
 
       try {
         i = libp2pRecord.selection.bestRecord(dht.selectors, key, recs)
-      } catch (err) {
+      } catch (/** @type {any} */err) {
         // Assume the first record if no selector available
         if (err.code !== 'ERR_NO_SELECTOR_FUNCTION_FOR_RECORD_KEY') {
           throw err
@@ -243,7 +243,7 @@ module.exports = (dht) => {
             const results = await dht._getValueOrPeers(peer, key)
             rec = results.record
             peers = results.peers
-          } catch (err) {
+          } catch (/** @type {any} */err) {
             // If we have an invalid record we just want to continue and fetch a new one.
             if (err.code !== 'ERR_INVALID_RECORD') {
               throw err
