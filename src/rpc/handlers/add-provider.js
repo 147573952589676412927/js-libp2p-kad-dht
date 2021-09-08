@@ -53,7 +53,7 @@ module.exports = (dht) => {
 
       if (!dht._isSelf(pi.id)) {
         // Add known address to peer store
-        dht.peerStore.addressBook.add(pi.id, pi.multiaddrs)
+        utils.addToStore(dht.libp2p.connectionManager, dht.peerStore, pi.id, { multiaddrs: pi.multiaddrs })
         return dht.providers.addProvider(cid, pi.id)
       }
     })

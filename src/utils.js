@@ -16,6 +16,13 @@ const { concat: uint8ArrayConcat } = require('uint8arrays/concat')
 const pTimeout = require('p-timeout')
 
 /**
+ * @typedef {*} ConnectionManager
+ * @typedef {*} PeerStore
+ * @typedef {import('libp2p-crypto').PublicKey} PublicKey
+ * @typedef {import('multiaddr').Multiaddr } Multiaddr
+ */
+
+/**
  * Creates a DHT ID by hashing a given Uint8Array.
  *
  * @param {Uint8Array} buf
@@ -241,4 +248,40 @@ exports.mapParallel = async function (asyncIterator, asyncFn) {
     tasks.push(asyncFn(item))
   }
   return Promise.all(tasks)
+}
+
+/**
+ * @param {ConnectionManager} connectionManager
+ * @param {PeerStore} peerStore
+ * @param {PeerId} peerId
+ * @param {{multiaddrs?: Multiaddr[], protocols?: string[], publicKey?: PublicKey}} data
+ * @returns {Promise<void>}
+ */
+exports.addToStore = async function (connectionManager, peerStore, peerId, {
+  multiaddrs,
+  protocols,
+  publicKey,
+}) {
+  const intercepted = await connectionManager.geter.interceptPeerDiscovery(peerId, {
+    multiaddrs,
+    protocols,
+    publicKey
+  })
+  if (multiaddrs && multiaddrs.length) {
+    const multiaddrsSet = new Set(multiaddrs)
+    for (const i of intercepted.multiaddrs) {
+      multiaddrsSet.delete(i)
+    }
+    peerStore.addressBook.add(peerId, Array.from(multiaddrsSet))
+  }
+  if (protocols && protocols.length) {
+    const protocolsSet = new Set(multiaddrs)
+    for (const i of intercepted.protocols) {
+      protocolsSet.delete(i)
+    }
+    peerStore.protocolBook.add(peerId, Array.from(protocolsSet))
+  }
+  if (publicKey && !intercepted.publicKey) {
+    peerStore.keyBook.set(peerId, publicKey)
+  }
 }

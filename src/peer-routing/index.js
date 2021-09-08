@@ -71,7 +71,7 @@ module.exports = (dht) => {
     return msg.closerPeers
       .filter((peerData) => !dht._isSelf(peerData.id))
       .map((peerData) => {
-        dht.peerStore.addressBook.add(peerData.id, peerData.multiaddrs)
+        utils.addToStore(dht.libp2p.connectionManager, dht.peerStore, peerData.id, { multiaddrs: peerData.multiaddrs })
 
         return peerData
       })
@@ -198,7 +198,7 @@ module.exports = (dht) => {
       result.paths.forEach((result) => {
         if (result.success && result.peer) {
           success = true
-          dht.peerStore.addressBook.add(result.peer.id, result.peer.multiaddrs)
+          utils.addToStore(dht.libp2p.connectionManager, dht.peerStore, result.peer.id, { multiaddrs: result.peer.multiaddrs })
         }
       })
       dht._log('findPeer %s: %s', id.toB58String(), success)
@@ -291,8 +291,7 @@ module.exports = (dht) => {
 
       const peerId = new PeerId(peer.id, undefined, pk)
       const addrs = ((peerData && peerData.addresses) || []).map((address) => address.multiaddr)
-      dht.peerStore.addressBook.add(peerId, addrs)
-      dht.peerStore.keyBook.set(peerId, pk)
+      utils.addToStore(dht.libp2p.connectionManager, dht.peerStore, peerId, { multiaddrs: addrs, publicKey: pk })
 
       return pk
     }
