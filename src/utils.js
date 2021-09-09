@@ -16,8 +16,7 @@ const { concat: uint8ArrayConcat } = require('uint8arrays/concat')
 const pTimeout = require('p-timeout')
 
 /**
- * @typedef {*} ConnectionManager
- * @typedef {*} PeerStore
+ * @typedef {import('./index')} dht
  * @typedef {import('libp2p-crypto').PublicKey} PublicKey
  * @typedef {import('multiaddr').Multiaddr } Multiaddr
  */
@@ -251,37 +250,47 @@ exports.mapParallel = async function (asyncIterator, asyncFn) {
 }
 
 /**
- * @param {ConnectionManager} connectionManager
- * @param {PeerStore} peerStore
+ * @param {dht} dht
  * @param {PeerId} peerId
- * @param {{multiaddrs?: Multiaddr[], protocols?: string[], publicKey?: PublicKey}} data
+ * @param {{multiaddrs?: Multiaddr[], protocols?: string[], publicKey?: PublicKey, metadata?: {key: string, value: Uint8Array}}} data
  * @returns {Promise<void>}
  */
-exports.addToStore = async function (connectionManager, peerStore, peerId, {
+exports.addToStore = async function (dht, peerId, {
   multiaddrs,
   protocols,
   publicKey,
+  metadata,
 }) {
-  const intercepted = await connectionManager.geter.interceptPeerDiscovery(peerId, {
+  const connectionManager = dht.libp2p.connectionManager
+  const peerStore = dht.peerStore
+  const intercepted = connectionManager.gater ? await connectionManager.geter.interceptPeerDiscovery(peerId, {
     multiaddrs,
     protocols,
-    publicKey
-  })
+    publicKey,
+    metadata
+  }) : {}
   if (multiaddrs && multiaddrs.length) {
     const multiaddrsSet = new Set(multiaddrs)
-    for (const i of intercepted.multiaddrs) {
-      multiaddrsSet.delete(i)
+    if (intercepted.multiaddrs) {
+      for (const i of intercepted.multiaddrs) {
+        multiaddrsSet.delete(i)
+      }
     }
     peerStore.addressBook.add(peerId, Array.from(multiaddrsSet))
   }
   if (protocols && protocols.length) {
     const protocolsSet = new Set(multiaddrs)
-    for (const i of intercepted.protocols) {
-      protocolsSet.delete(i)
+    if (intercepted.protocols) {
+      for (const i of intercepted.protocols) {
+        protocolsSet.delete(i)
+      }
     }
-    peerStore.protocolBook.add(peerId, Array.from(protocolsSet))
+    peerStore.protoBook.add(peerId, Array.from(protocolsSet))
   }
   if (publicKey && !intercepted.publicKey) {
     peerStore.keyBook.set(peerId, publicKey)
+  }
+  if (metadata && !intercepted.metadata) {
+    peerStore.metadataBook.set(metadata.key, metadata.value)
   }
 }
